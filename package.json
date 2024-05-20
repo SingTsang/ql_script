@@ -13,6 +13,7 @@
   },
   "private": true,
   "dependencies": {
-    "crypto-js": "^4.2.0"
+    "crypto-js": "^4.2.0",
+    "got": "^14.3.0"
   }
 }

@@ -14,7 +14,6 @@
  * --------------------------------------------------
  * new Env("得物")
  */
-import {sendNotify} from "./sendNotify";
 import crypto from "crypto-js";
 
 let ckName = "meituan";//CK变量名字
@@ -146,8 +145,6 @@ class Task {
         this.BuZhouRefreshStatus = false
         this.chanceCount = 0
         this.waitPrizeLocations = []
-        this.ua = UA
-        //this.sk = SK
     }
 
     async tree() {
@@ -1468,9 +1465,8 @@ class Task {
     if (!(await checkEnv())) return;
     if (userList.length > 0) {
         await main()
-
     }
-    await $.sendMsg($.logs.join("\n"))
+    // await $.sendMsg($.logs.join("\n"))
 })()
     .catch((e) => console.log(e))
     .finally(() => $.done());
@@ -1490,15 +1486,15 @@ async function checkEnv() {
                 break;
             }
         }
-
         for (let n of cookie.split(e)) {
             n && userList.push(new Task(n));
         }
     } else {
-        console.log(`未找到CK变量名【${ckName}】`);
+        console.log(`未找到CK变量名【${ckName}】`)
         return;
     }
-    return console.log(`共找到${userList.length}个账号`), true; //true == !0
+    console.log(`共找到${userList.length}个账号`)
+    return true
 }
 
 //Env Api =============================
