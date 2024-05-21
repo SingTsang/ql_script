@@ -22,8 +22,7 @@ https://market.chuxingyouhui.com/promo-bargain-api/activity/mqq/api/indexTopInfo
 hostname = market.chuxingyouhui.com
 
 */
-
-import got from 'got';
+import got from "got"
 
 const $ = new Env('全球购骑士特权')
 const jsname = '全球购骑士特权'
@@ -60,46 +59,180 @@ let rndtime = "" //毫秒
 ///////////////////////////////////////////////////////////////////
 
 !(async () => {
-
-    if (typeof $request !== "undefined") {
-        await getRewrite()
-    } else {
-        //检查环境变量
-        if (!(await checkEnv())) {
-            return
-        }
-
-        console.log('\n提现需要关注微信公众号，在公众号里申请提现')
-
-        for (userIdx = 0; userIdx < blackArr.length; userIdx++) {
-            console.log(`\n===== 开始用户${userIdx + 1} 勋章任务 =====`)
-            await querySignStatus()
-            await listUserTask()
-            // await listRedPacket()
-            //收取存钱罐看视频需要前置条件
-            // await queryPiggyInfo()
-            //翻卡看视频需要前置条件
-            // await getUserFlopRecord()
-        }
-        /*
-        for(userIdx=0; userIdx<blackArr.length; userIdx++) {
-            console.log(`\n===== 开始用户${userIdx+1} 视频任务 =====`)
-            //收取存钱罐看视频需要前置条件
-            //await queryPiggyInfo()
-            //翻卡看视频需要前置条件
-            //await getUserFlopRecord()
-        }*/
-        for (userIdx = 0; userIdx < blackArr.length; userIdx++) {
-            await userInfo()
-        }
-
-        await showmsg()
+    //检查环境变量
+    if (!(await checkEnv())) {
+        return
     }
-
-
+    console.log('\n提现需要关注微信公众号，在公众号里申请提现')
+    for (userIdx = 0; userIdx < blackArr.length; userIdx++) {
+        console.log(`\n===== 开始用户${userIdx + 1} 勋章任务 =====`)
+        await querySignStatus()
+        await listUserTask()
+        // await listRedPacket()
+        //收取存钱罐看视频需要前置条件
+        // await queryPiggyInfo()
+        //翻卡看视频需要前置条件
+        // await getUserFlopRecord()
+    }
+    /*
+    for(userIdx=0; userIdx<blackArr.length; userIdx++) {
+        console.log(`\n===== 开始用户${userIdx+1} 视频任务 =====`)
+        //收取存钱罐看视频需要前置条件
+        //await queryPiggyInfo()
+        //翻卡看视频需要前置条件
+        //await getUserFlopRecord()
+    }*/
+    for (userIdx = 0; userIdx < blackArr.length; userIdx++) {
+        await userInfo()
+    }
+    await showmsg()
 })()
     .catch((e) => $.logErr(e))
     .finally(() => $.done())
+
+//获取签到状态
+async function querySignStatus() {
+    const url = 'https://market.chuxingyouhui.com/promo-bargain-api/activity/weekSign/api/v1_0/calendar?appId=' + blackArr[userIdx]['appId']
+    const data = await got.get(url, {
+        headers: {
+            'Host': 'market.chuxingyouhui.com',
+            'Origin': 'https://m.black-unique.com',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            'black-token': blackArr[userIdx]['black-token'],
+            'Accept': 'application/json, text/plain, */*',
+            'User-Agent': blackArr[userIdx]['User-Agent'],
+            'Referer': 'https://m.black-unique.com/',
+            'token': blackArr[userIdx]['token'],
+            'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+        },
+    }).json()
+    if (data.code === 200) {
+        if (data.data && data.data.calendar && Array.isArray(data.data.calendar)) {
+            for (let i = 0; i < data.data.calendar.length; i++) {
+                let signItem = data.data.calendar[i]
+                if (signItem.isToday === true) {
+                    if (signItem.signStyle === 0) {
+                        await doSign()
+                    } else {
+                        console.log(`\n今日已签到\n`)
+                    }
+                }
+            }
+        }
+    } else {
+        console.log(`\n获取签到状态失败：${data.msg}\n`)
+    }
+}
+
+//签到
+async function doSign() {
+    const reqBody = `{}`
+    const encodeBody = encodeURIComponent(reqBody)
+    const url = 'https://market.chuxingyouhui.com/promo-bargain-api/activity/weekSign/api/v1_0/sign?appId=' + blackArr[userIdx]['appId']
+    const data = await got.post(url, {
+        headers: {
+            'Host': 'market.chuxingyouhui.com',
+            'request-body': encodeBody,
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'token': blackArr[userIdx]['token'],
+            'Content-Type': 'application/json;charset=utf-8',
+            'Origin': 'https://m.black-unique.com',
+            'User-Agent': blackArr[userIdx]['User-Agent'],
+            'black-token': blackArr[userIdx]['black-token'],
+            'Referer': 'https://m.black-unique.com/',
+            'Connection': 'keep-alive',
+        },
+        body: reqBody
+    }).json()
+    if (logDebug) console.log(data);
+    if (data.code === 200) {
+        console.log(`\n签到成功获得：${data.data.reward}金币，已连续签到${data.data.continuouslyDay}天\n`)
+    } else {
+        console.log(`\n签到失败：${data.msg}\n`)
+    }
+}
+
+//日常-任务列表
+async function listUserTask() {
+    rndtime = Math.round(new Date().getTime())
+    const reqBody = `{"activityType":13}`
+    const encodeBody = encodeURIComponent(reqBody)
+    const url = "https://market.chuxingyouhui.com/promo-bargain-api/activity/task/api/list_user_task"
+    const data = await got.post(url, {
+        headers: {
+            'Host': 'market.chuxingyouhui.com',
+            'request-body': encodeBody,
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'token': blackArr[userIdx]['token'],
+            'Content-Type': 'application/json;charset=utf-8',
+            'Origin': 'https://m.black-unique.com',
+            'User-Agent': blackArr[userIdx]['User-Agent'],
+            'black-token': blackArr[userIdx]['black-token'],
+            'Referer': 'https://m.black-unique.com/',
+            'Connection': 'keep-alive',
+        },
+        body: reqBody
+    }).json()
+    if (data.code === 200) {
+        if (data.data && Array.isArray(data.data)) {
+            for (let i = 0; i < data.data.length; i++) {
+                let taskItem = data.data[i]
+                if (taskItem.status === 0 && taskItem.finishedTimes < taskItem.totalTimes) {
+                    if (taskItem.taskType.indexOf('RECEIVE_MEDAL') > -1 && (rndtime < taskItem.receiveStartTime || rndtime > taskItem.receiveEndTime)) {
+                        //非整点领勋章时间
+                        console.log("非整点领勋章时间")
+                    } else if (taskItem.taskTitle === "抖音1分购") {
+                        console.log("跳过抖音一分购")
+                    } else if (taskItem.taskTitle === "3元3件") {
+                        console.log("跳过3元3件")
+                    } else if (taskItem.taskType.indexOf('SHOPPING') > -1) {
+                        //跳过购物任务
+                        console.log("跳过购买商品")
+                    } else {
+                        await doTask(taskItem.taskType, taskItem.userTaskId, taskItem.taskTitle)
+                    }
+                }
+
+            }
+        }
+    } else {
+        console.log(`查询任务列表失败：${data.msg}`)
+    }
+}
+
+//日常-完成任务
+async function doTask(taskType, userTaskId, taskTitle) {
+    const reqBody = `{"activityType":13,"taskType":"${taskType}","userTaskId":"${userTaskId}"}`
+    const encodeBody = encodeURIComponent(reqBody)
+    const url = "https://market.chuxingyouhui.com/promo-bargain-api/activity/task/api/doTask"
+    const data = await got.post(url, {
+        headers: {
+            'Host': 'market.chuxingyouhui.com',
+            'request-body': encodeBody,
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'token': blackArr[userIdx]['token'],
+            'Content-Type': 'application/json;charset=utf-8',
+            'Origin': 'https://m.black-unique.com',
+            'User-Agent': blackArr[userIdx]['User-Agent'],
+            'black-token': blackArr[userIdx]['black-token'],
+            'Referer': 'https://m.black-unique.com/',
+            'Connection': 'keep-alive',
+        },
+        body: reqBody
+    }).json()
+    if (data.code === 200) {
+        console.log(`完成任务【${data.data.taskTitle}】：获得${data.data.rewardScore}勋章`)
+    } else {
+        console.log(`完成任务【${taskTitle}】失败：${data.msg}`)
+    }
+}
 
 //通知
 async function showmsg() {
@@ -241,171 +374,6 @@ async function getBussinessInfo(adId, activityType, bussinessType, version) {
             }
         });
     });
-}
-
-//获取签到状态
-async function querySignStatus() {
-    const url = 'https://market.chuxingyouhui.com/promo-bargain-api/activity/weekSign/api/v1_0/calendar?appId=' + blackArr[userIdx]['appId']
-    const data = await got.get(url, {
-        headers: {
-            'Host': 'market.chuxingyouhui.com',
-            'Origin': 'https://m.black-unique.com',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Connection': 'keep-alive',
-            'black-token': blackArr[userIdx]['black-token'],
-            'Accept': 'application/json, text/plain, */*',
-            'User-Agent': blackArr[userIdx]['User-Agent'],
-            'Referer': 'https://m.black-unique.com/',
-            'token': blackArr[userIdx]['token'],
-            'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
-        },
-    }).json()
-    if (data.code === 200) {
-        if (data.data && data.data.calendar && Array.isArray(data.data.calendar)) {
-            for (let i = 0; i < data.data.calendar.length; i++) {
-                let signItem = data.data.calendar[i]
-                if (signItem.isToday === true) {
-                    if (signItem.signStyle === 0) {
-                        await doSign()
-                    } else {
-                        console.log(`\n今日已签到\n`)
-                    }
-                }
-            }
-        }
-    } else {
-        console.log(`\n获取签到状态失败：${data.msg}\n`)
-    }
-}
-
-//签到
-async function doSign() {
-    let caller = printCaller()
-    //rndtime = Math.round(new Date().getTime())
-    const reqBody = `{}`
-    const encodeBody = encodeURIComponent(reqBody)
-    return new Promise((resolve) => {
-        let url = {
-            url: 'https://market.chuxingyouhui.com/promo-bargain-api/activity/weekSign/api/v1_0/sign?appId=' + blackArr[userIdx]['appId'],
-            headers: {
-                'Host': 'market.chuxingyouhui.com',
-                'request-body': encodeBody,
-                'Accept': 'application/json, text/plain, */*',
-                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'token': blackArr[userIdx]['token'],
-                'Content-Type': 'application/json;charset=utf-8',
-                'Origin': 'https://m.black-unique.com',
-                'User-Agent': blackArr[userIdx]['User-Agent'],
-                'black-token': blackArr[userIdx]['black-token'],
-                'Referer': 'https://m.black-unique.com/',
-                'Connection': 'keep-alive',
-            },
-            body: reqBody
-        };
-        $.post(url, async (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log("Fucntion " + caller + ": API请求失败");
-                    console.log(JSON.stringify(err));
-                    $.logErr(err);
-                } else {
-                    if (safeGet(data)) {
-                        let result = JSON.parse(data);
-                        if (logDebug) console.log(result);
-                        if (result.code == 200) {
-                            console.log(`\n签到成功获得：${result.data.reward}金币，已连续签到${result.data.continuouslyDay}天\n`)
-                        } else {
-                            console.log(`\n签到失败：${result.msg}\n`)
-                        }
-                    }
-                }
-            } catch (e) {
-                $.logErr(e, resp);
-            } finally {
-                resolve();
-            }
-        });
-    });
-}
-
-//日常-任务列表
-async function listUserTask() {
-    rndtime = Math.round(new Date().getTime())
-    const reqBody = `{"activityType":13}`
-    const encodeBody = encodeURIComponent(reqBody)
-    const url = "https://market.chuxingyouhui.com/promo-bargain-api/activity/task/api/list_user_task"
-    const data = await got.post(url, {
-        headers: {
-            'Host': 'market.chuxingyouhui.com',
-            'request-body': encodeBody,
-            'Accept': 'application/json, text/plain, */*',
-            'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'token': blackArr[userIdx]['token'],
-            'Content-Type': 'application/json;charset=utf-8',
-            'Origin': 'https://m.black-unique.com',
-            'User-Agent': blackArr[userIdx]['User-Agent'],
-            'black-token': blackArr[userIdx]['black-token'],
-            'Referer': 'https://m.black-unique.com/',
-            'Connection': 'keep-alive',
-        },
-        body: reqBody
-    }).json()
-    if (data.code === 200) {
-        if (data.data && Array.isArray(data.data)) {
-            for (let i = 0; i < data.data.length; i++) {
-                let taskItem = data.data[i]
-                if (taskItem.status === 0 && taskItem.finishedTimes < taskItem.totalTimes) {
-                    if (taskItem.taskType.indexOf('RECEIVE_MEDAL') > -1 && (rndtime < taskItem.receiveStartTime || rndtime > taskItem.receiveEndTime)) {
-                        //非整点领勋章时间
-                        console.log("非整点领勋章时间")
-                    } else if (taskItem.taskTitle === "抖音1分购") {
-                        console.log("跳过抖音一分购")
-                    } else if (taskItem.taskTitle === "3元3件") {
-                        console.log("跳过3元3件")
-                    } else if (taskItem.taskType.indexOf('SHOPPING') > -1) {
-                        //跳过购物任务
-                        console.log("跳过购买商品")
-                    } else {
-                        await doTask(taskItem.taskType, taskItem.userTaskId, taskItem.taskTitle)
-                    }
-                }
-
-            }
-        }
-    } else {
-        console.log(`查询任务列表失败：${data.msg}`)
-    }
-}
-
-//日常-完成任务
-async function doTask(taskType, userTaskId, taskTitle) {
-    const reqBody = `{"activityType":13,"taskType":"${taskType}","userTaskId":"${userTaskId}"}`
-    const encodeBody = encodeURIComponent(reqBody)
-    const url = "https://market.chuxingyouhui.com/promo-bargain-api/activity/task/api/doTask"
-    const data = await got.post(url, {
-        headers: {
-            'Host': 'market.chuxingyouhui.com',
-            'request-body': encodeBody,
-            'Accept': 'application/json, text/plain, */*',
-            'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'token': blackArr[userIdx]['token'],
-            'Content-Type': 'application/json;charset=utf-8',
-            'Origin': 'https://m.black-unique.com',
-            'User-Agent': blackArr[userIdx]['User-Agent'],
-            'black-token': blackArr[userIdx]['black-token'],
-            'Referer': 'https://m.black-unique.com/',
-            'Connection': 'keep-alive',
-        },
-        body: reqBody
-    }).json()
-    if (data.code === 200) {
-        console.log(`完成任务【${data.data.taskTitle}】：获得${data.data.rewardScore}勋章`)
-    } else {
-        console.log(`完成任务【${taskTitle}】失败：${data.msg}`)
-    }
 }
 
 //存钱罐状态
