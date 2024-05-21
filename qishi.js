@@ -1,36 +1,18 @@
 /*
 APP：全球购骑士特权
-
-直接appstore搜索下载，方便的话可以微信扫下面图片二维码走邀请注册，谢谢
-https://raw.githubusercontent.com/leafTheFish/DeathNote/main/blackUnique.jpg
-
-定时为每小时一次，务必在0分到5分之间运行，目前每天大概1毛7
 提现需要关注微信公众号，在公众号里申请提现
-
 青龙：
 捉https://market.chuxingyouhui.com/promo-bargain-api/activity/mqq/api/indexTopInfo的包
 然后填在blackJSON里面，注意按照JSON格式填写。用青龙面板的环境变量或者外面用双引号的，字符串内需要用\"转义
 export blackJSON='{"black-token":"", "token":"", "User-Agent":"", "appId":""}'
-
-V2P，圈X：重写方法 -- 点击右下角【我的】-> 【每日签到赚现金】
-[task_local]
-#全球购骑士特权
-0 * * * * https://raw.githubusercontent.com/leafTheFish/DeathNote/main/blackUnique.js, tag=全球购骑士特权, enabled=true
-[rewrite_local]
-https://market.chuxingyouhui.com/promo-bargain-api/activity/mqq/api/indexTopInfo? url script-request-header https://raw.githubusercontent.com/leafTheFish/DeathNote/main/blackUnique.js
-[MITM]
-hostname = market.chuxingyouhui.com
-
 */
 // import got from "got"
-// const got = require("got")
-
-let got;
+const got = require("got")
 
 const $ = new Env('全球购骑士特权')
 const jsname = '全球购骑士特权'
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
-const logDebug = 1
+const logDebug = 0
 
 //const notify = $.isNode() ? require('./sendNotify') : '';
 let notifyStr = ''
@@ -50,7 +32,6 @@ let redPacketCount = 0
 let waterCount = 0
 let fertilizerCount = 0
 let clickTreeTimes = 1
-let signRetryTimes = 3
 let signRetryCount = 0
 let totalMoney = 0
 
@@ -69,22 +50,8 @@ let rndtime = "" //毫秒
     console.log('\n提现需要关注微信公众号，在公众号里申请提现')
     for (userIdx = 0; userIdx < blackArr.length; userIdx++) {
         console.log(`\n===== 开始用户${userIdx + 1} 勋章任务 =====`)
-        await querySignStatus()
         await listUserTask()
-        // await listRedPacket()
-        //收取存钱罐看视频需要前置条件
-        // await queryPiggyInfo()
-        //翻卡看视频需要前置条件
-        // await getUserFlopRecord()
     }
-    /*
-    for(userIdx=0; userIdx<blackArr.length; userIdx++) {
-        console.log(`\n===== 开始用户${userIdx+1} 视频任务 =====`)
-        //收取存钱罐看视频需要前置条件
-        //await queryPiggyInfo()
-        //翻卡看视频需要前置条件
-        //await getUserFlopRecord()
-    }*/
     for (userIdx = 0; userIdx < blackArr.length; userIdx++) {
         await userInfo()
     }
@@ -304,16 +271,7 @@ async function checkEnv() {
         console.log('未找到有效的blackJSON')
         return false
     }
-
     console.log(`共找到${blackArr.length}个用户`)
-
-    await import('got').then(module => {
-        console.log("123456")
-        got = module.default;
-    }).catch(error => {
-        got = require('got');
-    });
-
     return true
 }
 
@@ -1530,61 +1488,6 @@ function Env(t, e) {
             return "undefined" != typeof $loon
         }
 
-        toObj(t, e = null) {
-            try {
-                return JSON.parse(t)
-            } catch {
-                return e
-            }
-        }
-
-        toStr(t, e = null) {
-            try {
-                return JSON.stringify(t)
-            } catch {
-                return e
-            }
-        }
-
-        getjson(t, e) {
-            let s = e;
-            const i = this.getdata(t);
-            if (i) try {
-                s = JSON.parse(this.getdata(t))
-            } catch {
-            }
-            return s
-        }
-
-        setjson(t, e) {
-            try {
-                return this.setdata(JSON.stringify(t), e)
-            } catch {
-                return !1
-            }
-        }
-
-        getScript(t) {
-            return new Promise(e => {
-                this.get({url: t}, (t, s, i) => e(i))
-            })
-        }
-
-        runScript(t, e) {
-            return new Promise(s => {
-                let i = this.getdata("@chavy_boxjs_userCfgs.httpapi");
-                i = i ? i.replace(/\n/g, "").trim() : i;
-                let r = this.getdata("@chavy_boxjs_userCfgs.httpapi_timeout");
-                r = r ? 1 * r : 20, r = e && e.timeout ? e.timeout : r;
-                const [o, h] = i.split("@"), a = {
-                    url: `http://${h}/v1/scripting/evaluate`,
-                    body: {script_text: t, mock_type: "cron", timeout: r},
-                    headers: {"X-Key": o, Accept: "*/*"}
-                };
-                this.post(a, (t, e, i) => s(i))
-            }).catch(t => this.logErr(t))
-        }
-
         loaddata() {
             if (!this.isNode()) return {};
             {
@@ -1623,20 +1526,6 @@ function Env(t, e) {
             return Object(t) !== t ? t : (Array.isArray(e) || (e = e.toString().match(/[^.[\]]+/g) || []), e.slice(0, -1).reduce((t, s, i) => Object(t[s]) === t[s] ? t[s] : t[s] = Math.abs(e[i + 1]) >> 0 == +e[i + 1] ? [] : {}, t)[e[e.length - 1]] = s, t)
         }
 
-        getdata(t) {
-            let e = this.getval(t);
-            if (/^@/.test(t)) {
-                const [, s, i] = /^@(.*?)\.(.*?)$/.exec(t), r = s ? this.getval(s) : "";
-                if (r) try {
-                    const t = JSON.parse(r);
-                    e = t ? this.lodash_get(t, i, "") : e
-                } catch (t) {
-                    e = ""
-                }
-            }
-            return e
-        }
-
         setdata(t, e) {
             let s = !1;
             if (/^@/.test(e)) {
@@ -1665,31 +1554,6 @@ function Env(t, e) {
             this.got = this.got ? this.got : require("got"), this.cktough = this.cktough ? this.cktough : require("tough-cookie"), this.ckjar = this.ckjar ? this.ckjar : new this.cktough.CookieJar, t && (t.headers = t.headers ? t.headers : {}, void 0 === t.headers.Cookie && void 0 === t.cookieJar && (t.cookieJar = this.ckjar))
         }
 
-        get(t, e = (() => {
-        })) {
-            t.headers && (delete t.headers["Content-Type"], delete t.headers["Content-Length"]), this.isSurge() || this.isLoon() ? (this.isSurge() && this.isNeedRewrite && (t.headers = t.headers || {}, Object.assign(t.headers, {"X-Surge-Skip-Scripting": !1})), $httpClient.get(t, (t, s, i) => {
-                !t && s && (s.body = i, s.statusCode = s.status), e(t, s, i)
-            })) : this.isQuanX() ? (this.isNeedRewrite && (t.opts = t.opts || {}, Object.assign(t.opts, {hints: !1})), $task.fetch(t).then(t => {
-                const {statusCode: s, statusCode: i, headers: r, body: o} = t;
-                e(null, {status: s, statusCode: i, headers: r, body: o}, o)
-            }, t => e(t))) : this.isNode() && (this.initGotEnv(t), this.got(t).on("redirect", (t, e) => {
-                try {
-                    if (t.headers["set-cookie"]) {
-                        const s = t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();
-                        this.ckjar.setCookieSync(s, null), e.cookieJar = this.ckjar
-                    }
-                } catch (t) {
-                    this.logErr(t)
-                }
-            }).then(t => {
-                const {statusCode: s, statusCode: i, headers: r, body: o} = t;
-                e(null, {status: s, statusCode: i, headers: r, body: o}, o)
-            }, t => {
-                const {message: s, response: i} = t;
-                e(s, i, i && i.body)
-            }))
-        }
-
         post(t, e = (() => {
         })) {
             if (t.body && t.headers && !t.headers["Content-Type"] && (t.headers["Content-Type"] = "application/x-www-form-urlencoded"), t.headers && delete t.headers["Content-Length"], this.isSurge() || this.isLoon()) this.isSurge() && this.isNeedRewrite && (t.headers = t.headers || {}, Object.assign(t.headers, {"X-Surge-Skip-Scripting": !1})), $httpClient.post(t, (t, s, i) => {
@@ -1708,21 +1572,6 @@ function Env(t, e) {
                     e(s, i, i && i.body)
                 })
             }
-        }
-
-        time(t) {
-            let e = {
-                "M+": (new Date).getMonth() + 1,
-                "d+": (new Date).getDate(),
-                "H+": (new Date).getHours(),
-                "m+": (new Date).getMinutes(),
-                "s+": (new Date).getSeconds(),
-                "q+": Math.floor(((new Date).getMonth() + 3) / 3),
-                S: (new Date).getMilliseconds()
-            };
-            /(y+)/.test(t) && (t = t.replace(RegExp.$1, ((new Date).getFullYear() + "").substr(4 - RegExp.$1.length)));
-            for (let s in e) new RegExp("(" + s + ")").test(t) && (t = t.replace(RegExp.$1, 1 == RegExp.$1.length ? e[s] : ("00" + e[s]).substr(("" + e[s]).length)));
-            return t
         }
 
         msg(e = t, s = "", i = "", r) {
@@ -1756,10 +1605,6 @@ function Env(t, e) {
         logErr(t, e) {
             const s = !this.isSurge() && !this.isQuanX() && !this.isLoon();
             s ? this.log("", `\u2757\ufe0f${this.name}, \u9519\u8bef!`, t.stack) : this.log("", `\u2757\ufe0f${this.name}, \u9519\u8bef!`, t)
-        }
-
-        wait(t) {
-            return new Promise(e => setTimeout(e, t))
         }
 
         done(t = {}) {
