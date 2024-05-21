@@ -17,8 +17,8 @@ const logDebug = 0
 //const notify = $.isNode() ? require('./sendNotify') : '';
 let notifyStr = ''
 
-// let blackJSON = ($.isNode() ? (process.env.blackJSON) : ($.getval('blackJSON'))) || ''
-let blackJSON = "{\"black-token\":\"eyJhbGciOiJIUzI1NiJ9.eyJjYXJkX251bWJlciI6MTY2NjE1NjMxLCJob2xkZXIiOiLlhbPlv5fplJAiLCJ1c2VyX2lkIjo1MzI1OTMxLCJwaG9uZSI6IjEzMDc4NDIyMTYzIn0.9SFf5j7zsDmLHqG6WNDOJ5pc45jVFgxzOebX9OFpY0k\", \"token\":\"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTQxNjgwNzQ1NjI3MTI4NDEzIiwiYm9keSI6IntcImlkZW50aWZpZXJcIjpcIjE2NjYxNTYzMVwiLFwibmlja25hbWVcIjpcIuWFs-W_l-mUkFwiLFwic2V4XCI6MCxcInVzZXJJZFwiOjExNDE2ODA3NDU2MjcxMjg0MTN9IiwicmFuIjotMTc3MzQ1MjU0OX0.1rq3pnV6dQ-s5C12cvIzfhCnmGwLV1V2jV2mUxM2sSjDDg3nUjiyl7sh0ijoPTNlSWf_7av4W6BlNDsmJguLNg\", \"User-Agent\":\"ZZCAndroid/black/2.31.0/oppo (Android; Android 13; OnePlus; LE2110; Build/TP1A.220905.001; zh) MUID/ZfpWQh9cS5wDAM+5TwIdQDoA\", \"appId\":\"1194494896220667904\"}"
+let blackJSON = ($.isNode() ? (process.env.blackJSON) : ($.getval('blackJSON'))) || ''
+// let blackJSON = "{\"black-token\":\"eyJhbGciOiJIUzI1NiJ9.eyJjYXJkX251bWJlciI6MTY2NjE1NjMxLCJob2xkZXIiOiLlhbPlv5fplJAiLCJ1c2VyX2lkIjo1MzI1OTMxLCJwaG9uZSI6IjEzMDc4NDIyMTYzIn0.9SFf5j7zsDmLHqG6WNDOJ5pc45jVFgxzOebX9OFpY0k\", \"token\":\"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTQxNjgwNzQ1NjI3MTI4NDEzIiwiYm9keSI6IntcImlkZW50aWZpZXJcIjpcIjE2NjYxNTYzMVwiLFwibmlja25hbWVcIjpcIuWFs-W_l-mUkFwiLFwic2V4XCI6MCxcInVzZXJJZFwiOjExNDE2ODA3NDU2MjcxMjg0MTN9IiwicmFuIjotMTc3MzQ1MjU0OX0.1rq3pnV6dQ-s5C12cvIzfhCnmGwLV1V2jV2mUxM2sSjDDg3nUjiyl7sh0ijoPTNlSWf_7av4W6BlNDsmJguLNg\", \"User-Agent\":\"ZZCAndroid/black/2.31.0/oppo (Android; Android 13; OnePlus; LE2110; Build/TP1A.220905.001; zh) MUID/ZfpWQh9cS5wDAM+5TwIdQDoA\", \"appId\":\"1194494896220667904\"}"
 let blackArr = []
 
 let userIdx = 0
