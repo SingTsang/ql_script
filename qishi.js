@@ -22,7 +22,10 @@ https://market.chuxingyouhui.com/promo-bargain-api/activity/mqq/api/indexTopInfo
 hostname = market.chuxingyouhui.com
 
 */
-import got from "got"
+// import got from "got"
+// const got = require("got")
+
+let got;
 
 const $ = new Env('全球购骑士特权')
 const jsname = '全球购骑士特权'
@@ -303,6 +306,14 @@ async function checkEnv() {
     }
 
     console.log(`共找到${blackArr.length}个用户`)
+
+    await import('got').then(module => {
+        console.log("123456")
+        got = module.default;
+    }).catch(error => {
+        got = require('got');
+    });
+
     return true
 }
 
