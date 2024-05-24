@@ -1,6 +1,6 @@
 /**
  * cron 10 11 * * *
- * 依赖 crypto-js & jsencrypt 
+ * 依赖 crypto-js & jsencrypt
  * 得物APP 探索中的玩一玩 所有游戏的入口都在那里  请跑任务之前手动玩一次
  * --------------------------------------------------
  * 变量名:dewuCK
@@ -548,7 +548,7 @@ class Task {
                     if (i.isComplete == false) {
                         if (i.taskType == 1) {
                             if (i.classify == 2) {
-                                //浏览  
+                                //浏览
 
                                 taskStatus = await this.DoTask(i)
                             }
@@ -717,7 +717,7 @@ class Task {
                         await $.wait(2500)
                         if (i.taskType == 1) {
                             if (i.classify == 2) {
-                                //浏览  
+                                //浏览
 
                                 taskStatus = await this.DoTask(i)
                             }
@@ -962,7 +962,7 @@ class Task {
                         await $.wait(2500)
                         if (i.taskType == 1) {
                             if (i.classify == 2) {
-                                //浏览  
+                                //浏览
 
                                 taskStatus = await this.DoTask(i)
                             }
@@ -1205,7 +1205,7 @@ class Task {
         function Ho(e) {
             for (var t = 0; t < 2 * e; t++)
                 Uo[t] = Math.floor(16 * Math.random()) + 48,
-                    Uo[t] >= 58 && (Uo[t] += 39);
+                Uo[t] >= 58 && (Uo[t] += 39);
             return String.fromCharCode.apply(null, Uo.slice(0, 2 * e));
         }
 
@@ -1406,7 +1406,7 @@ async function checkEnv() {
 }
 //Env Api =============================
 /*
-*   @modifyAuthor @smallfawn 
+*   @modifyAuthor @smallfawn
 *   @modifyTime 2024-03-25
 *   @modifyInfo 重写请求函数 在got环境或axios环境都可以请求 删除不必要的函数
 */
@@ -1507,11 +1507,11 @@ function Env(t, s) {
         initRequestEnv(t) {
             try {
                 require.resolve("got") &&
-                    ((this.requset = require("got")), (this.requestModule = "got"));
+                ((this.requset = require("got")), (this.requestModule = "got"));
             } catch (e) { }
             try {
                 require.resolve("axios") &&
-                    ((this.requset = require("axios")), (this.requestModule = "axios"));
+                ((this.requset = require("axios")), (this.requestModule = "axios"));
             } catch (e) { }
             this.cktough = this.cktough ? this.cktough : require("tough-cookie");
             this.ckjar = this.ckjar ? this.ckjar : new this.cktough.CookieJar();
@@ -1666,18 +1666,18 @@ function Env(t, s) {
                 S: new Date().getMilliseconds(),
             };
             /(y+)/.test(t) &&
-                (t = t.replace(
-                    RegExp.$1,
-                    (new Date().getFullYear() + "").substr(4 - RegExp.$1.length)
-                ));
+            (t = t.replace(
+                RegExp.$1,
+                (new Date().getFullYear() + "").substr(4 - RegExp.$1.length)
+            ));
             for (let e in s)
                 new RegExp("(" + e + ")").test(t) &&
-                    (t = t.replace(
-                        RegExp.$1,
-                        1 == RegExp.$1.length
-                            ? s[e]
-                            : ("00" + s[e]).substr(("" + s[e]).length)
-                    ));
+                (t = t.replace(
+                    RegExp.$1,
+                    1 == RegExp.$1.length
+                        ? s[e]
+                        : ("00" + s[e]).substr(("" + s[e]).length)
+                ));
             return t;
         }
         msg(s = t, e = "", i = "", o) {
@@ -1698,9 +1698,9 @@ function Env(t, s) {
                                     : void 0
                             : void 0;
             this.isMute ||
-                (this.isSurge() || this.isLoon()
-                    ? $notification.post(s, e, i, h(o))
-                    : this.isQuanX() && $notify(s, e, i, h(o)));
+            (this.isSurge() || this.isLoon()
+                ? $notification.post(s, e, i, h(o))
+                : this.isQuanX() && $notify(s, e, i, h(o)));
             let logs = ["", "==============📣系统通知📣=============="];
             logs.push(t);
             e ? logs.push(e) : "";
