@@ -9,7 +9,7 @@ export blackJSON='{"black-token":"", "token":"", "User-Agent":"", "appId":""}'
 // import got from "got"
 const got = require("got")
 
-let jieTingCheToken = process.env.jieTingCheToken
+let jieTingCheToken = process.env["jieTingCheToken"]
 // let jieTingCheToken = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI0MDI1MjVjNjNmMmY0MmIyYWUyMGE5MDcxYWU4NDMxNiIsInN1YiI6IntcInVzZXJTb3VyY2VcIjpcIkFQUFwiLFwib3NUeXBlXCI6XCJBTkRST0lEXCIsXCJkZXZpY2VJZFwiOlwiM2Q3NWZjODRjNGNiOTA0MzgyZWVmYWU3NzAyNDQ1MDlcIn0iLCJpYXQiOjE3MTY1NTg4MzcsImV4cCI6MTcxOTE1MDgzN30.Xtkq89hjaAw7JBLUUx3lYvC7ML12A5fj87rwxkQhsjo"
 
 main().catch(() => {}).finally(() => {});
@@ -38,7 +38,6 @@ async function listUserTask() {
         },
         body: reqBody
     }).json()
-    console.log(data)
     if (data.success === true) {
         console.log(`领取优惠卷成功`)
     } else {
@@ -48,7 +47,7 @@ async function listUserTask() {
 
 async function checkEnv() {
     if (!jieTingCheToken) {
-        console.log('jieTingCheToken')
+        console.log('找不到jieTingCheToken')
         return false
     }
     return true
