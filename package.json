@@ -14,7 +14,9 @@
   "private": true,
   "dependencies": {
     "crypto-js": "^4.2.0",
+    "formdata-node": "^6.0.3",
     "got": "14.2.1",
+    "qs": "^6.12.1",
     "typescript": "^5.4.5"
   }
 }
