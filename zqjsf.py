@@ -15,6 +15,10 @@ export zqurl='xxxxxxx'
 
 """
 
+# 禁用 SSL 证书验证（不推荐用于生产环境）
+ssl_context = ssl.create_default_context(cafile=certifi.where())
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
 
 class zq:
     def __init__(self):
@@ -260,7 +264,7 @@ class zq:
             await self.kkz(user)
             for box in ['time_reward', 'box_one', 'box_three', 'box_five']:
                 await self.reward(user, box)
-            # await self.article_list(user)  # 文章加豆，我觉得没必要开
+            await self.article_list(user)  # 文章加豆，我觉得没必要开
         await self.close()
 
 
