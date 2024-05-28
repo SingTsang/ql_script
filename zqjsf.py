@@ -16,9 +16,9 @@ export zqurl='xxxxxxx'
 """
 
 # 禁用 SSL 证书验证（不推荐用于生产环境）
-ssl_context = ssl.create_default_context(cafile=certifi.where())
-ssl_context.check_hostname = False
-ssl_context.verify_mode = ssl.CERT_NONE
+# ssl_context = ssl.create_default_context(cafile=certifi.where())
+# ssl_context.check_hostname = False
+# ssl_context.verify_mode = ssl.CERT_NONE
 
 class zq:
     def __init__(self):
