@@ -1,7 +1,7 @@
-import got from "got"
-import crypto from "crypto"
-// const crypto = require('crypto');
-// const got = require("got")
+// import got from "got"
+// import crypto from "crypto"
+const crypto = require('crypto');
+const got = require("got")
 
 // let wc = process.env["wc"]
 // let jieTingCheToken = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI0MDI1MjVjNjNmMmY0MmIyYWUyMGE5MDcxYWU4NDMxNiIsInN1YiI6IntcInVzZXJTb3VyY2VcIjpcIkFQUFwiLFwib3NUeXBlXCI6XCJBTkRST0lEXCIsXCJkZXZpY2VJZFwiOlwiM2Q3NWZjODRjNGNiOTA0MzgyZWVmYWU3NzAyNDQ1MDlcIn0iLCJpYXQiOjE3MTY1NTg4MzcsImV4cCI6MTcxOTE1MDgzN30.Xtkq89hjaAw7JBLUUx3lYvC7ML12A5fj87rwxkQhsjo"
