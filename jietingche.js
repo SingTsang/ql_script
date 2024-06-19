@@ -1,11 +1,3 @@
-/*
-APP：全球购骑士特权
-提现需要关注微信公众号，在公众号里申请提现
-青龙：
-捉https://market.chuxingyouhui.com/promo-bargain-api/activity/mqq/api/indexTopInfo的包
-然后填在blackJSON里面，注意按照JSON格式填写。用青龙面板的环境变量或者外面用双引号的，字符串内需要用\"转义
-export blackJSON='{"black-token":"", "token":"", "User-Agent":"", "appId":""}'
-*/
 // import got from "got"
 const got = require("got")
 
