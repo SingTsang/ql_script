@@ -1,6 +1,6 @@
 let wangchao = process.env["wangchao"]
 
-// let wangchao = "667234746ab0c819a2f1a1e6#667234746ab0c819a2f1a1e7#00000000-69ba-ad9c-0000-00004cddb023#72912973#fZ9xj5xivqlmj1lMhnGkjQCk6oxtqKK24E-QINb01ULJfhVGGjWMfQKeWnqMIt26wFTPi1g2jUn9xFWDI1c45LK9WssfhqLJfFYei-XXSR_9lesi0-XfWAB2EI2GoqW9feXt-2DnKn-V3Ogn-I7FBNW1fAb_OOtr1OWs-4VgqpklQejgCaHvV0Icxr61cNiRFib7hGwffziRba_1CZNXV8sNjNNfGImtDNc1zRd97w9Xwbj3CR9-esQpc52_CLIAMFKfynKveiCA-_A7jvp9vh9ceBUsBgRBz_1CcAUd4Qte3Ctxe2tVUZKdeLg7UNABAglpKpFilyjPeSn-25PNGgYTcAm06gOOogQnqbVa_sdF2wm-25PNGgSR-0-4_55vT"
+// let wangchao = "667234746ab0c819a2f1a1e6#667234746ab0c819a2f1a1e7#00000000-69ba-ad9c-0000-00004cddb023"
 
 let userList = []
 
@@ -237,7 +237,7 @@ async function checkEnv() {
     const user = wangchao.split("&")
     for (const [index, item] of user.entries()) {
         const split = item.split("#")
-        if (split.length !== 5) {
+        if (split.length !== 3) {
             console.log(`账号${index + 1}规则错误`)
             return false
         }
