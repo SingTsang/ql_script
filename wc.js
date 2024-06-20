@@ -76,7 +76,6 @@ async function login(user) {
         return
     }
     JSESSIONID = id
-    console.log("JSESSIONID=" + JSESSIONID)
 }
 
 async function listUserArticle(user) {
