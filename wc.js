@@ -1,12 +1,8 @@
-// import got from "got"
-// import crypto from "crypto"
-const crypto = require('crypto');
-const got = require("got")
+let wangchao = process.env["wangchao"]
 
-// let wc = process.env["wc"]
-// let jieTingCheToken = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI0MDI1MjVjNjNmMmY0MmIyYWUyMGE5MDcxYWU4NDMxNiIsInN1YiI6IntcInVzZXJTb3VyY2VcIjpcIkFQUFwiLFwib3NUeXBlXCI6XCJBTkRST0lEXCIsXCJkZXZpY2VJZFwiOlwiM2Q3NWZjODRjNGNiOTA0MzgyZWVmYWU3NzAyNDQ1MDlcIn0iLCJpYXQiOjE3MTY1NTg4MzcsImV4cCI6MTcxOTE1MDgzN30.Xtkq89hjaAw7JBLUUx3lYvC7ML12A5fj87rwxkQhsjo"
+// let wangchao = "667234746ab0c819a2f1a1e6#667234746ab0c819a2f1a1e7#00000000-69ba-ad9c-0000-00004cddb023#72912973#fZ9xj5xivqlmj1lMhnGkjQCk6oxtqKK24E-QINb01ULJfhVGGjWMfQKeWnqMIt26wFTPi1g2jUn9xFWDI1c45LK9WssfhqLJfFYei-XXSR_9lesi0-XfWAB2EI2GoqW9feXt-2DnKn-V3Ogn-I7FBNW1fAb_OOtr1OWs-4VgqpklQejgCaHvV0Icxr61cNiRFib7hGwffziRba_1CZNXV8sNjNNfGImtDNc1zRd97w9Xwbj3CR9-esQpc52_CLIAMFKfynKveiCA-_A7jvp9vh9ceBUsBgRBz_1CcAUd4Qte3Ctxe2tVUZKdeLg7UNABAglpKpFilyjPeSn-25PNGgYTcAm06gOOogQnqbVa_sdF2wm-25PNGgSR-0-4_55vT"
 
-let wangchao = "123"
+let userList = []
 
 let articles = []
 
@@ -18,42 +14,47 @@ main().catch(() => {
 });
 
 async function main() {
-    // 检查环境变量
+    await loadDependencies()
+
     if (!(await checkEnv())) return;
 
     console.log('\n望潮每日抽奖');
 
-    await login()
-    await listUserArticle()
-    if (!articles) {
-        return
-    }
+    for (const user of userList) {
 
-    let allRead = true
-    for (const item of articles) {
-        allRead = allRead && item.isRead
-    }
-    if (!allRead){
-        for (const item of articles) {
-            await readArticle(item)
-            console.log("等待5秒")
-            await delay(5000)
+        await login(user)
+
+        await listUserArticle(user)
+        if (!articles) {
+            return
         }
+
+        let allRead = true
+        for (const item of articles) {
+            allRead = allRead && item.isRead
+        }
+        if (!allRead) {
+            for (const item of articles) {
+                await readArticle(item, user)
+                console.log("等待5秒")
+                await delay(5000)
+            }
+        }
+
+        await activityLogin(user)
+
+        if (!ACTIVITY_JSESSIONID) {
+            return
+        }
+
+        await finishActivity(user)
+
+        await userAwardRecordUpgrade(user)
     }
-
-    await activityLogin()
-
-    if (!ACTIVITY_JSESSIONID){
-        return
-    }
-
-    await finishActivity()
-
-    await userAwardRecordUpgrade()
 }
 
-async function login() {
-    const url = 'https://xmt.taizhou.com.cn/prod-api/user-read/app/login?id=667234746ab0c819a2f1a1e6&sessionId=667234746ab0c819a2f1a1e7&deviceId=00000000-69ba-ad9c-0000-00004cddb023'
+async function login(user) {
+    const url = `https://xmt.taizhou.com.cn/prod-api/user-read/app/login?id=${user[0]}&sessionId=${user[1]}&deviceId=${user[2]}`
     const data = await got.get(url, {
         headers: {
             'Host': 'xmt.taizhou.com.cn',
@@ -77,7 +78,7 @@ async function login() {
     console.log("JSESSIONID=" + JSESSIONID)
 }
 
-async function listUserArticle() {
+async function listUserArticle(user) {
     if (!JSESSIONID) {
         console.log("结束=listUserArticle")
         return
@@ -96,7 +97,7 @@ async function listUserArticle() {
             'Sec-Fetch-Dest': 'empty',
             'Referer': 'https://xmt.taizhou.com.cn/readingLuck-v1/',
             'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
-            'Cookie': `cookie=72912973; tfstk=fZ9xj5xivqlmj1lMhnGkjQCk6oxtqKK24E-QINb01ULJfhVGGjWMfQKeWnqMIt26wFTPi1g2jUn9xFWDI1c45LK9WssfhqLJfFYei-XXSR_9lesi0-XfWAB2EI2GoqW9feXt-2DnKn-V3Ogn-I7FBNW1fAb_OOtr1OWs-4VgqpklQejgCaHvV0Icxr61cNiRFib7hGwffziRba_1CZNXV8sNjNNfGImtDNc1zRd97w9Xwbj3CR9-esQpc52_CLIAMFKfynKveiCA-_A7jvp9vh9ceBUsBgRBz_1CcAUd4Qte3Ctxe2tVUZKdeLg7UNABAglpKpFilyjPeSn-25PNGgYTcAm06gOOogQnqbVa_sdF2wm-25PNGgSR-0-4_55vT; JSESSIONID=${JSESSIONID}`
+            'Cookie': `cookie=${user[3]}; tfstk=${user[4]}; JSESSIONID=${JSESSIONID}`
         }
     }).json()
     if (data.code !== 200) {
@@ -107,8 +108,8 @@ async function listUserArticle() {
     console.log(`请求文章列表成功`)
 }
 
-async function readArticle(item) {
-    if (item.isRead === true){
+async function readArticle(item, user) {
+    if (item.isRead === true) {
         console.log("已经阅读=" + item.title)
         return
     }
@@ -126,7 +127,7 @@ async function readArticle(item) {
             'Sec-Fetch-Dest': 'empty',
             'Referer': 'https://xmt.taizhou.com.cn/readingLuck-v1/',
             'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
-            'Cookie': `cookie=72912973; tfstk=fZ9xj5xivqlmj1lMhnGkjQCk6oxtqKK24E-QINb01ULJfhVGGjWMfQKeWnqMIt26wFTPi1g2jUn9xFWDI1c45LK9WssfhqLJfFYei-XXSR_9lesi0-XfWAB2EI2GoqW9feXt-2DnKn-V3Ogn-I7FBNW1fAb_OOtr1OWs-4VgqpklQejgCaHvV0Icxr61cNiRFib7hGwffziRba_1CZNXV8sNjNNfGImtDNc1zRd97w9Xwbj3CR9-esQpc52_CLIAMFKfynKveiCA-_A7jvp9vh9ceBUsBgRBz_1CcAUd4Qte3Ctxe2tVUZKdeLg7UNABAglpKpFilyjPeSn-25PNGgYTcAm06gOOogQnqbVa_sdF2wm-25PNGgSR-0-4_55vT; JSESSIONID=${JSESSIONID}`
+            'Cookie': `cookie=${user[3]}; tfstk=${user[4]}; JSESSIONID=${JSESSIONID}`
         }
     }).json()
     if (data.code !== 200) {
@@ -136,8 +137,8 @@ async function readArticle(item) {
     console.log(`阅读文章成功=` + item.title)
 }
 
-async function activityLogin() {
-    const url = `https://srv-app.taizhou.com.cn/tzrb/user/loginWC?accountId=667234746ab0c819a2f1a1e6&sessionId=667234746ab0c819a2f1a1e7`
+async function activityLogin(user) {
+    const url = `https://srv-app.taizhou.com.cn/tzrb/user/loginWC?accountId=${user[0]}&sessionId=${user[1]}`
     const data = await got.get(url, {
         headers: {
             'Host': 'srv-app.taizhou.com.cn',
@@ -162,7 +163,7 @@ async function activityLogin() {
     console.log(`活动登录成功`)
 }
 
-async function finishActivity() {
+async function finishActivity(user) {
     const url = `https://srv-app.taizhou.com.cn/tzrb/userAwardRecordUpgrade/saveUpdate`
     const data = await got.post(url, {
         headers: {
@@ -177,7 +178,7 @@ async function finishActivity() {
             'Sec-Fetch-Dest': 'empty',
             'Referer': 'https://srv-app.taizhou.com.cn/luckdraw-ra-1/',
             'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
-            'Cookie': `JSESSIONID=${ACTIVITY_JSESSIONID}; tfstk=fKvjY6fw9ENsH1K5SsnPdOBcGJW21EMEBls9xhe4XtBAW1KCPmbNQhIOCE-27ZS2XNT6zaJV_tLaBNTvJGo03nCOCaS1kKBAQOa68hbAQium5Gt65r7xoIrDZe-L3KlcQR6cIO3E8vkUmnXGB3Dpe3UceMIKQiIAXXKJInuE8vkr6IeyG2RN_9QBVGb8D5evW8IRrGZABZCTy7IdyNBOBFB82ijQW-eTMuUJiU45ql_ec0ZTf4E-UstAPJK9FiCYin77CRxlMs_LLawTBLsDqB92g8HOJBYJwIp-b7jcCHs1cKiatNAFfhICpky9VELJd6prrR7O49yFR0E015bYBg_EV0Ng_pU1Q_JiMqzFMgjPL0i7_KfAqg_EV0NgssIlqPoSV5Jc.`,
+            'Cookie': `JSESSIONID=${ACTIVITY_JSESSIONID}; tfstk=${user[4]}.`,
             'Content-type': 'application/x-www-form-urlencoded'
         },
         form: {
@@ -194,7 +195,7 @@ async function finishActivity() {
     console.log(`保存活动成功`)
 }
 
-async function userAwardRecordUpgrade() {
+async function userAwardRecordUpgrade(user) {
     const url = `https://srv-app.taizhou.com.cn/tzrb/userAwardRecordUpgrade/pageList?pageSize=10&pageNum=1&activityId=67`
     const data = await got.get(url, {
         headers: {
@@ -208,7 +209,7 @@ async function userAwardRecordUpgrade() {
             'Sec-Fetch-Dest': 'empty',
             'Referer': 'https://srv-app.taizhou.com.cn/luckdraw-ra-1/',
             'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
-            'Cookie': `JSESSIONID=${ACTIVITY_JSESSIONID}; tfstk=fLMZYe0ePRS2a2h08yw4zrAB9TdTB8LWoxabmmm0fP4g5S1mLqi0lS4X6KRmW2C_iFes3XumRP2bfFL40muV55VX6vy3-rUglCH13r4n-1Ms5EF0304KCcMqDtrmmqKTlhdIXceYnUTS3LitXOtn-WDaswqnvo5Gi_2mvI2YnUTCGMMJd-37czxe3DxUfu_gnlqMYWqY-OqcIobHYoU3o-VGnMX3XoQcjtXMiI3mPUrTs3Dg-r7kOmNarDANntkhF5UojySfMvrwyzmg8tXbWA4tM0027TEi3lkzCxxWdrznsx2sIe6qz2luLvNOmEris0k8wxYF4GbYxk0qHxpAi5qLYztexHE4y8BAYgbVMsFT9kzWx_fAM5qLYzteYsCY1GEUPHfl.`
+            'Cookie': `JSESSIONID=${ACTIVITY_JSESSIONID}; tfstk=${user[4]}.`
         }
     }).json()
     if (data.code !== 200) {
@@ -233,6 +234,16 @@ async function checkEnv() {
         console.log('找不到wangchao')
         return false
     }
+    const user = wangchao.split("&")
+    for (const [index, item] of user.entries()) {
+        const split = item.split("#")
+        if (split.length !== 5) {
+            console.log(`账号${index + 1}规则错误`)
+            return false
+        }
+        userList.push(split)
+    }
+
     return true
 }
 
@@ -263,7 +274,7 @@ function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function parseActivitySession(headers){
+function parseActivitySession(headers) {
     for (let i = 0; i < headers.length; i += 2) {
         if (headers[i] === 'Set-Cookie') {
             const cookieValue = headers[i + 1];
@@ -274,3 +285,26 @@ function parseActivitySession(headers){
         }
     }
 }
+
+async function loadDependencies() {
+    if (typeof window !== 'undefined' && typeof window.document !== 'undefined') {
+        // 浏览器环境
+        console.log("浏览器运行环境")
+        const gotModule = await import('got');
+        const cryptoModule = await import('crypto');
+
+        window.got = gotModule.default;
+        window.crypto = cryptoModule.default;
+    } else {
+        console.log("其他运行环境")
+        const gotModule = await import('got');
+        const cryptoModule = await import('crypto');
+        global.got = gotModule.default;
+        global.crypto = cryptoModule.default;
+
+        // Node.js 环境
+        // global.got = require('got');
+        // global.crypto = require('crypto');
+    }
+}
+
