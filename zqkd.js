@@ -1,5 +1,5 @@
-let zqkdToken = process.env["zqkdToken"]
-// let zqkdToken = "uid=1041036001&token=1IvDz8sOpqFrgOEXR%2F14IWORVxQ7H5ogMzF1YUqDdz4RgE1DaeI6Y%2FUXlPpnOI2MqTCUAT3RfZqO7y7r60vF5A&token_id=03938212361a9a5e5f681a4bab4005bc&app_version=2.8.4&openudid=b0bdc272999fb431&channel=c6010&device_id=41000412&device_model=LE2110&device_brand=ONEPLUS&resolution=1080*2400&os_version=33&is_wxaccount=1&active_channel=c6010&access=wifi&v=1718879590295&f=1&from=tab&sign=3da1136f6fa68a33048a716d0fcc3d75"
+// let zqkdToken = process.env["zqkdToken"]
+let zqkdToken = "uid=1041026647&token=1IvDz8sOpqFrgOEXR%2F14IWORVxQ7H5ogHdSaScd9JUZb4R%2F1x7k%2B0HS1s6ZZExjBI2jFMw7ge84gTwFKRhgR7g&token_id=f3f8ef01b1c15c87e1732033c102ba99&app_version=2.8.4&openudid=b0bdc272999fb431&channel=c6010&device_id=41000412&device_model=LE2110&device_brand=ONEPLUS&resolution=1080*2400&os_version=33&is_wxaccount=1&active_channel=c6010&access=wifi&v=1718893050747&f=1&from=tab&sign=5e6ff60eb3b86c3f19c7c977fb324b5e"
 
 let userList = []
 
@@ -48,6 +48,9 @@ async function main() {
     }
 }
 
+// uid=1041026647&token=1IvDz8sOpqFrgOEXR%2F14IWORVxQ7H5ogHdSaScd9JUZb4R%2F1x7k%2B0HS1s6ZZExjBI2jFMw7ge84gTwFKRhgR7g&app_version=2.8.4
+// uid=1041026647&token=1IvDz8sOpqFrgOEXR/14IWORVxQ7H5ogHdSaScd9JUZb4R/1x7k+0HS1s6ZZExjBI2jFMw7ge84gTwFKRhgR7g&app_version=2.8.4
+
 async function taskList(user) {
     let url = `https://user.youth.cn/FastApi/NewTaskSimple/getTaskList.json?uid=${user.uid}&token=${user.token}&app_version=2.8.4`
     const options = {
@@ -88,13 +91,17 @@ async function receiveReward(user) {
             'Referer': 'https://user.youth.cn/h5/fastAppWeb/taskcenter2/index.html?uid=1041026647&token=1IvDz8sOpqFrgOEXR/14IWORVxQ7H5ogHdSaScd9JUZb4R/1x7k+0HS1s6ZZExjBtPF3Uozg1FG+JeBlax18jw==&token_id=2ea2ce7ef90bba6e4a55e057853f41cb&app_version=2.8.4&openudid=b0bdc272999fb431&channel=c6010&device_id=41000412&device_model=LE2110&device_brand=ONEPLUS&resolution=1080*2400&os_version=33&is_wxaccount=1&active_channel=c6010&access=wifi&v=1718870371584',
             'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
             'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        form:{
+            'uid': `${user.uid}`,
+            'action': 'read_thirty_minute'
         }
     };
-    const data = await got.get(`https://user.youth.cn/FastApi/CommonReward/toGetReward.json`, options).json()
+    const data = await got.post(`https://user.youth.cn/FastApi/CommonReward/toGetReward.json`, options).json()
     if (data.success === true && data.items) {
         console.log("领取奖励成功=" + data.items.score + "青豆")
     } else {
-        console.log("领取奖励成功失败" + data.message)
+        console.log("领取奖励失败" + data.message)
     }
 }
 
@@ -483,14 +490,16 @@ async function articleList() {
 
 function parseUserInfo() {
     // 将查询字符串解析为对象
-    const params = new URLSearchParams(zqkdToken);
-    const body = {};
-    params.forEach((value, key) => {
+    const pairs = zqkdToken.split('&');
+    const result = {};
+
+    pairs.forEach(pair => {
+        const [key, value] = pair.split('=');
         if (key !== "sign" && key !== "app_version") {
-            body[key] = decodeURIComponent(value);
+            result[decodeURIComponent(key)] = value; // 保留原始编码的值
         }
     });
-    userList.push(sortObjectByKeys(body))
+    userList.push(sortObjectByKeys(result))
 }
 
 function sortObjectByKeys(obj) {
@@ -502,14 +511,6 @@ function sortObjectByKeys(obj) {
     });
 
     return sortedObj; // 返回排序后的对象
-}
-
-function createForm(user) {
-    const time = new Date().getTime()
-    const copy = user
-    copy.request_time = time
-    copy.sign = signature(copy)
-    return copy
 }
 
 function signature(user) {
