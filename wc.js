@@ -20,7 +20,8 @@ async function main() {
 
     console.log('\n望潮每日抽奖');
 
-    for (const user of userList) {
+    for (const [index, user] of userList.entries()) {
+        console.log(`账号[${index + 1}]开始运行`)
 
         await login(user)
 
